@@ -1,10 +1,22 @@
+const searchInput = document.getElementById("searchInput");
 const resultList = document.getElementById("resultList");
 const topList = document.getElementById("topList");
 
-const searchInput = document.getElementById("searchInput");
-searchInput.addEventListener("focus", function () {
-  resultList.style.display = "block";
-});
+function refreshSongs() {
+  const query = searchInput.value.trim();
+  if (query !== "") {
+    fetch(`https://songsearch.funmc.net/v1/songs`, {
+      method: "POST",
+      body: query,
+    })
+      .then((response) => response.json())
+      .then((data) => displayResults(data.results))
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        displayAlert("ERROR", "Couldn't load songs");
+      });
+  } else resultList.innerHTML = "";
+}
 
 function refreshTop() {
   fetch(`https://songsearch.funmc.net/v1/carnaval/songs`, {
@@ -60,7 +72,6 @@ function addSong(list, song, name) {
   listItem.className = "list-group-item";
   listItem.textContent = name ? name : song;
   listItem.addEventListener("click", function () {
-    // searchInput.value = song;
     selectedItemDiv.textContent = `${song}`;
     if (list == resultList) list.style.display = "none";
   });
@@ -69,27 +80,17 @@ function addSong(list, song, name) {
 
 function displayAlert(status, message) {
   const statusField = document.getElementById("statusField");
-  statusField.innerHTML = `<div class="alert ${
+  statusField.innerHTML = `<section class="alert ${
     status === "SUCCESS" ? "alert-success" : "alert-danger"
-  }" role="alert">${message}</div>`;
+  }" role="alert">${message}</section>`;
 }
 
+searchInput.addEventListener("focus", function () {
+  refreshSongs();
+  resultList.style.display = "block";
+});
 searchInput.addEventListener("input", function () {
-  const query = this.value.trim();
-  if (query !== "") {
-    fetch(`https://songsearch.funmc.net/v1/songs`, {
-      method: "POST",
-      body: query,
-    })
-      .then((response) => response.json())
-      .then((data) => displayResults(data.results))
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        displayAlert("ERROR", "Couldn't load songs");
-      });
-  } else {
-    document.getElementById("resultList").innerHTML = "";
-  }
+  refreshSongs();
 });
 
 const submitVoteBtn = document.getElementById("submitVote");
@@ -105,6 +106,7 @@ submitVoteBtn.addEventListener("click", function () {
       refreshTop();
     })
     .catch((error) => {
+      console.error("Error submitting data:", error);
       displayAlert("ERROR", "Failed! Please try again later, and report this!");
     });
 });

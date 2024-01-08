@@ -1,5 +1,6 @@
 body {
   background-color: orange !important;
+  overflow-x: hidden;
 }
 
 .logo {
@@ -7,6 +8,9 @@ body {
   margin-left: auto;
   margin-right: auto;
   width: 50%;
+  transform-origin: center center;
+  animation: zoom 3s infinite ease;
+  max-width: 100%;
 }
 
 .container {
@@ -22,6 +26,10 @@ body {
   margin-bottom: 1vh;
 }
 
+.vote {
+  margin-top: 2vh;
+}
+
 .list-group-item {
   cursor: pointer;
 }
@@ -34,25 +42,12 @@ body {
   margin-top: 15px;
 }
 
-#resultList {
-  margin-top: 15px;
-}
-
 .vote-btn {
   margin-top: 15px;
 }
 
 #statusField {
   margin-top: 15px;
-}
-
-body {
-  overflow-x: hidden;
-}
-img {
-  transform-origin: center center;
-  animation: zoom 3s infinite ease;
-  max-width: 100%;
 }
 
 @keyframes zoom {
