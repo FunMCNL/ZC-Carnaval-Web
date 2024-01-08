@@ -3,85 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.png" />
     <title>Kies je Kraker</title>
+    <link href="assets/css/style.css" rel="stylesheet" />
+
     <!-- Add Bootstrap CSS -->
     <link
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <link rel="icon" type="image/x-icon" href="assets/img/favicon.png" />
-    <style>
-      /* Additional style for carnival theme */
-      body {
-        background-color: orange; /* Carnival Yellow */
-      }
-
-      .logo {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        width: 50%;
-      }
-
-      .container {
-        background-color: rgb(231, 231, 231); /* White background for content */
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      }
-
-      .search {
-        position: relative;
-        margin: 0;
-        margin-bottom: 1vh;
-      }
-
-      .list-group-item {
-        cursor: pointer;
-      }
-
-      .list-group-item:hover {
-        color: gray;
-      }
-
-      #selectedItem {
-        margin-top: 15px;
-      }
-
-      #resultList {
-        margin-top: 15px;
-      }
-
-      .vote-btn {
-        margin-top: 15px;
-      }
-
-      #statusField {
-        margin-top: 15px;
-      }
-
-      body {
-        overflow-x: hidden;
-      }
-      img {
-        transform-origin: center center;
-        animation: zoom 3s infinite ease;
-        max-width: 100%;
-      }
-
-      @keyframes zoom {
-        0% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.05);
-          /* equals 105% */
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
-    </style>
   </head>
   <body onload="refreshTop()">
     <div class="container mt-5">
@@ -112,136 +42,17 @@
         <b>Geselecteerd: </b>
         <p id="selectedItem">Geen</p>
       </div>
-      <!-- Display selected item here -->
 
       <button class="btn btn-danger btn-block vote-btn" id="submitVote">
         Insturen
       </button>
     </div>
 
-    <!-- Add Bootstrap JS and jQuery -->
+    <script src="assets/js/script.js"></script>
+
+    <!-- Add Bootstrap JS, jQuery and Popper -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-    <script>
-      const resultList = document.getElementById("resultList");
-      const topList = document.getElementById("topList");
-
-      const searchInput = document.getElementById("searchInput");
-      searchInput.addEventListener("focus", function () {
-        resultList.style.display = "block";
-      });
-
-      function refreshTop() {
-        fetch(`https://songsearch.funmc.net/v1/carnaval/songs`, {
-          method: "GET",
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            topList.innerHTML = "";
-
-            const sortedVotes = Object.entries(data.votes)
-              .sort(([, a], [, b]) => b - a)
-              .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
-
-            Object.keys(sortedVotes)
-              .slice(0, 5)
-              .forEach((vote) =>
-                addSong(
-                  topList,
-                  vote,
-                  getIndex(sortedVotes, vote) + 1 + ". " + vote
-                )
-              );
-          })
-          .catch((error) => {
-            console.error("Error fetching prefill data:", error);
-            const nothingFound = document.createElement("p");
-            nothingFound.textContent = "No results found";
-            topList.appendChild(nothingFound);
-          });
-      }
-
-      function getIndex(haystack, needle) {
-        const keysArray = Object.keys(haystack);
-        return keysArray.indexOf(needle);
-      }
-
-      function displayResults(results) {
-        resultList.innerHTML = "";
-
-        if (results.trackmatches.track.length === 0) {
-          const nothingFound = document.createElement("p");
-          nothingFound.textContent = "No results found";
-          resultList.appendChild(nothingFound);
-        } else
-          results.trackmatches.track
-            .slice(0, 5)
-            .forEach((track) =>
-              addSong(resultList, track.name + " - " + track.artist, null)
-            );
-
-        resultList.style.display = "block";
-      }
-
-      function addSong(list, song, name) {
-        const selectedItemDiv = document.getElementById("selectedItem");
-        const listItem = document.createElement("li");
-        listItem.className = "list-group-item";
-        listItem.textContent = name ? name : song;
-        listItem.addEventListener("click", function () {
-          // searchInput.value = song;
-          selectedItemDiv.textContent = `${song}`;
-          if (list == resultList) list.style.display = "none";
-        });
-        list.appendChild(listItem);
-      }
-
-      function displayAlert(status, message) {
-        const statusField = document.getElementById("statusField");
-        statusField.innerHTML = `<div class="alert ${
-          status === "SUCCESS" ? "alert-success" : "alert-danger"
-        }" role="alert">${message}</div>`;
-      }
-
-      searchInput.addEventListener("input", function () {
-        const query = this.value.trim();
-        if (query !== "") {
-          fetch(`https://songsearch.funmc.net/v1/songs`, {
-            method: "POST",
-            body: query,
-          })
-            .then((response) => response.json())
-            .then((data) => displayResults(data.results))
-            .catch((error) => {
-              console.error("Error fetching data:", error);
-              displayAlert("ERROR", "Couldn't load songs");
-            });
-        } else {
-          document.getElementById("resultList").innerHTML = "";
-        }
-      });
-
-      const submitVoteBtn = document.getElementById("submitVote");
-      submitVoteBtn.addEventListener("click", function () {
-        var selectedSong = selectedItem.textContent.trim();
-        fetch("https://songsearch.funmc.net/v1/carnaval", {
-          method: "POST",
-          body: selectedSong,
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            displayAlert(data.status, data.message);
-            refreshTop();
-          })
-          .catch((error) => {
-            displayAlert(
-              "ERROR",
-              "Failed! Please try again later, and report this!"
-            );
-          });
-      });
-    </script>
   </body>
 </html>
