@@ -1,11 +1,12 @@
 const searchInput = document.getElementById("searchInput");
 const resultList = document.getElementById("resultList");
 const topList = document.getElementById("topList");
+const api = 'https://songsearch.funmc.net/v1';
 
 function refreshSongs() {
   const query = searchInput.value.trim();
   if (query !== "") {
-    fetch(`https://songsearch.funmc.net/v1/songs`, {
+    fetch(`${api}/songs`, {
       method: "POST",
       body: query,
     })
@@ -19,7 +20,7 @@ function refreshSongs() {
 }
 
 function refreshTop() {
-  fetch(`https://songsearch.funmc.net/v1/carnaval/songs`, {
+  fetch(`${api}/carnaval/songs`, {
     method: "GET",
   })
     .then((response) => response.json())
@@ -96,7 +97,7 @@ searchInput.addEventListener("input", function () {
 const submitVoteBtn = document.getElementById("submitVote");
 submitVoteBtn.addEventListener("click", function () {
   var selectedSong = selectedItem.textContent.trim();
-  fetch("https://songsearch.funmc.net/v1/carnaval", {
+  fetch(`${api}/carnaval`, {
     method: "POST",
     body: selectedSong,
   })
