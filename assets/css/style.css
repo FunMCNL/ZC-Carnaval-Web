@@ -20,36 +20,6 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.search {
-  position: relative;
-  margin: 0;
-  margin-bottom: 1vh;
-}
-
-.vote {
-  margin-top: 2vh;
-}
-
-.list-group-item {
-  cursor: pointer;
-}
-
-.list-group-item:hover {
-  color: gray;
-}
-
-#selectedItem {
-  margin-top: 15px;
-}
-
-.vote-btn {
-  margin-top: 15px;
-}
-
-#statusField {
-  margin-top: 15px;
-}
-
 @keyframes zoom {
   0% {
     transform: scale(1);
